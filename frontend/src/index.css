@@ -1,0 +1,189 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-primary-hover: var(--primary-hover);
+
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+
+  --color-accent: var(--accent);
+  --color-accent-soft: var(--accent-soft);
+  --color-accent-foreground: var(--accent-foreground);
+
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+
+  --color-surface: var(--surface);
+
+  --font-display:
+    "Manrope",
+    "Plus Jakarta Sans",
+    Inter,
+    ui-sans-serif,
+    system-ui,
+    sans-serif;
+
+  --font-sans:
+    Inter,
+    ui-sans-serif,
+    system-ui,
+    sans-serif;
+
+  --shadow-soft: 0 18px 50px -24px rgb(15 23 42 / 0.28);
+  --shadow-lift: 0 30px 80px -36px rgb(15 23 42 / 0.38);
+}
+
+/*
+  ============================================================
+  GENERIC HACKATHON THEME
+  ============================================================
+
+  Change these variables for every hackathon.
+
+  You do NOT need to redesign all components.
+*/
+
+:root {
+  --radius: 1rem;
+
+  /* Base */
+  --background: oklch(0.985 0.008 250);
+  --foreground: oklch(0.22 0.035 255);
+
+  /* Cards */
+  --card: oklch(1 0 0);
+  --card-foreground: oklch(0.22 0.035 255);
+
+  /* Popovers */
+  --popover: oklch(1 0 0);
+  --popover-foreground: oklch(0.22 0.035 255);
+
+  /* Main brand */
+  --primary: oklch(0.38 0.14 264);
+  --primary-hover: oklch(0.34 0.15 264);
+  --primary-foreground: oklch(0.985 0.01 250);
+
+  /* Secondary */
+  --secondary: oklch(0.95 0.018 250);
+  --secondary-foreground: oklch(0.35 0.055 255);
+
+  /* Muted */
+  --muted: oklch(0.955 0.012 250);
+  --muted-foreground: oklch(0.53 0.035 255);
+
+  /* Accent */
+  --accent: oklch(0.72 0.14 180);
+  --accent-soft: oklch(0.94 0.04 180);
+  --accent-foreground: oklch(0.18 0.045 195);
+
+  /* Feedback */
+  --destructive: oklch(0.60 0.20 25);
+  --destructive-foreground: oklch(0.985 0.01 250);
+
+  /* Borders / inputs */
+  --border: oklch(0.90 0.015 250);
+  --input: oklch(0.88 0.018 250);
+  --ring: oklch(0.67 0.10 220);
+
+  /* Layout */
+  --surface: oklch(0.965 0.012 250);
+
+  /* Hero glow */
+  --glow-a: oklch(0.85 0.10 250 / 0.28);
+  --glow-b: oklch(0.86 0.10 180 / 0.18);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  margin: 0;
+  min-width: 320px;
+  min-height: 100vh;
+  background: var(--color-background);
+  color: var(--color-foreground);
+  font-family: var(--font-sans);
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+}
+
+button,
+input,
+textarea,
+select {
+  font: inherit;
+}
+
+@layer base {
+  * {
+    border-color: var(--color-border);
+  }
+}
+
+@utility font-display {
+  font-family: var(--font-display);
+}
+
+@keyframes fade-up {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@utility animate-fade-up {
+  animation: fade-up 0.7s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+@utility flip-card {
+  transform-style: preserve-3d;
+  transition:
+    transform 0.6s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+@utility flip-face {
+  backface-visibility: hidden;
+}
+
+@layer components {
+  .container-app {
+    @apply mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8;
+  }
+
+  .card {
+    @apply rounded-2xl border bg-card shadow-sm;
+  }
+
+  .input {
+    @apply h-10 w-full rounded-xl border bg-background px-3 text-sm outline-none transition focus:border-ring focus:ring-2 focus:ring-ring/20;
+  }
+}
