@@ -3,6 +3,12 @@ FastAPI Complete Example Application
 Demonstrates all boilerplate features integrated together.
 """
 
+# ADD THIS PATH FIX AT THE VERY TOP
+import sys
+from pathlib import Path
+sys.path.insert(0, str(Path(__file__).parent))
+# END OF PATH FIX
+
 from fastapi import FastAPI, Depends, Request
 from fastapi.middleware.cors import CORSMiddleware
 from contextlib import asynccontextmanager

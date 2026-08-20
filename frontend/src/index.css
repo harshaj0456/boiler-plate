@@ -35,18 +35,9 @@
   --color-surface: var(--surface);
 
   --font-display:
-    "Manrope",
-    "Plus Jakarta Sans",
-    Inter,
-    ui-sans-serif,
-    system-ui,
-    sans-serif;
+    "Manrope", "Plus Jakarta Sans", Inter, ui-sans-serif, system-ui, sans-serif;
 
-  --font-sans:
-    Inter,
-    ui-sans-serif,
-    system-ui,
-    sans-serif;
+  --font-sans: Inter, ui-sans-serif, system-ui, sans-serif;
 
   --shadow-soft: 0 18px 50px -24px rgb(15 23 42 / 0.28);
   --shadow-lift: 0 30px 80px -36px rgb(15 23 42 / 0.38);
@@ -63,53 +54,31 @@
 */
 
 :root {
-  --radius: 1rem;
+  --background: #F8F5EF;
+  --foreground: #191919;
 
-  /* Base */
-  --background: oklch(0.985 0.008 250);
-  --foreground: oklch(0.22 0.035 255);
+  --card: #FFFFFF;
+  --card-foreground: #191919;
 
-  /* Cards */
-  --card: oklch(1 0 0);
-  --card-foreground: oklch(0.22 0.035 255);
+  --primary: #171717;
+  --primary-hover: #000000;
+  --primary-foreground: #FFFFFF;
 
-  /* Popovers */
-  --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.22 0.035 255);
+  --secondary: #EEE9DF;
+  --secondary-foreground: #252525;
 
-  /* Main brand */
-  --primary: oklch(0.38 0.14 264);
-  --primary-hover: oklch(0.34 0.15 264);
-  --primary-foreground: oklch(0.985 0.01 250);
+  --muted: #F1EEE7;
+  --muted-foreground: #6B6862;
 
-  /* Secondary */
-  --secondary: oklch(0.95 0.018 250);
-  --secondary-foreground: oklch(0.35 0.055 255);
+  --accent: #D69A2D;
+  --accent-soft: #F5E7C5;
+  --accent-foreground: #513707;
 
-  /* Muted */
-  --muted: oklch(0.955 0.012 250);
-  --muted-foreground: oklch(0.53 0.035 255);
+  --border: #E2DDD2;
+  --input: #D8D2C7;
+  --ring: #9A7A32;
 
-  /* Accent */
-  --accent: oklch(0.72 0.14 180);
-  --accent-soft: oklch(0.94 0.04 180);
-  --accent-foreground: oklch(0.18 0.045 195);
-
-  /* Feedback */
-  --destructive: oklch(0.60 0.20 25);
-  --destructive-foreground: oklch(0.985 0.01 250);
-
-  /* Borders / inputs */
-  --border: oklch(0.90 0.015 250);
-  --input: oklch(0.88 0.018 250);
-  --ring: oklch(0.67 0.10 220);
-
-  /* Layout */
-  --surface: oklch(0.965 0.012 250);
-
-  /* Hero glow */
-  --glow-a: oklch(0.85 0.10 250 / 0.28);
-  --glow-b: oklch(0.86 0.10 180 / 0.18);
+  --surface: #F4F0E8;
 }
 
 * {
@@ -166,8 +135,7 @@ select {
 
 @utility flip-card {
   transform-style: preserve-3d;
-  transition:
-    transform 0.6s cubic-bezier(0.22, 1, 0.36, 1);
+  transition: transform 0.6s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 @utility flip-face {

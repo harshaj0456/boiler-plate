@@ -1,24 +1,45 @@
-import apiClient from "./client";
+// src/api/auth.js
 
-export const authApi = {
-  login: (payload) => apiClient.post("/auth/login", payload),
+let accessToken = null;
 
-  register: (payload) =>
-    apiClient.post("/auth/register", payload),
-
-  me: () => apiClient.get("/auth/me"),
-};
-
-export function setAccessToken(token) {
+export const setAccessToken = (token) => {
+  accessToken = token;
   if (token) {
     localStorage.setItem("access_token", token);
   }
-}
+};
 
-export function getAccessToken() {
-  return localStorage.getItem("access_token");
-}
+export const getAccessToken = () => accessToken || localStorage.getItem("access_token");
 
-export function clearAccessToken() {
-  localStorage.removeItem("access_token");
-}
+const API_URL = import.meta.env.VITE_API_URL || "http://localhost:8000";
+
+export const authApi = {
+  login: async (data) => {
+    const response = await fetch(`${API_URL}/api/auth/login`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(data)
+    });
+    return response.json();
+  },
+
+  register: async (data) => {
+    const response = await fetch(`${API_URL}/api/auth/register`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(data)
+    });
+    return response.json();
+  },
+
+  logout: async () => {
+    const response = await fetch(`${API_URL}/api/auth/logout`, {
+      method: "GET",
+      headers: {
+        "Authorization": `Bearer ${getAccessToken()}`
+      }
+    });
+    setAccessToken(null);
+    return response.json();
+  }
+};

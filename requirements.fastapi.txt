@@ -1,38 +1,55 @@
+# ==========================================
 # FastAPI Core
-fastapi==0.109.0
-uvicorn[standard]==0.27.0
-pydantic==2.5.3
-pydantic-settings==2.1.0
+# Python 3.14 compatible
+# ==========================================
+fastapi==0.116.1
+uvicorn[standard]==0.35.0
+pydantic==2.13.1
+pydantic-settings==2.10.1
 
+# ==========================================
 # Database
-sqlalchemy==2.0.25
-psycopg2-binary==2.9.9
-alembic==1.13.1
+# ==========================================
+sqlalchemy==2.0.43
+psycopg2-binary==2.9.12
+alembic==1.16.5
 
+# ==========================================
 # Authentication
-pyjwt==2.8.0
+# ==========================================
+PyJWT==2.10.1
 passlib[bcrypt]==1.7.4
-python-multipart==0.0.6
+python-multipart==0.0.20
 
+# ==========================================
 # CORS & Security
-python-jose==3.3.0
+# ==========================================
+python-jose==3.5.0
 slowapi==0.1.9
-redis==5.0.1
+redis==6.4.0
 
+# ==========================================
 # Utilities
-python-dotenv==1.0.0
-requests==2.31.0
+# ==========================================
+python-dotenv==1.1.1
+requests==2.32.4
 
+# ==========================================
 # Testing
-pytest==7.4.4
-pytest-cov==4.1.0
-pytest-asyncio==0.23.3
-httpx==0.26.0
+# ==========================================
+pytest==8.4.1
+pytest-cov==6.2.1
+pytest-asyncio==1.1.0
+httpx==0.28.1
 
+# ==========================================
 # Linting & Formatting
-flake8==7.0.0
-black==23.12.1
-isort==5.13.2
+# ==========================================
+flake8==7.3.0
+black==25.1.0
+isort==6.0.1
 
+# ==========================================
 # Production Server
-gunicorn==21.2.0
+# ==========================================
+gunicorn==23.0.0

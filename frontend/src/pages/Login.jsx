@@ -12,11 +12,14 @@ import {
   ShieldCheck,
   Sparkles,
 } from "lucide-react";
+
 import { authApi, setAccessToken } from "@/api/auth";
 
 const LOGIN_CONFIG = {
   brand: import.meta.env.VITE_APP_NAME || "Your App",
+
   eyebrow: import.meta.env.VITE_APP_EYEBROW || "Hackathon Solution",
+
   subheading:
     import.meta.env.VITE_APP_TAGLINE ||
     "Technology that turns ideas into measurable impact.",
@@ -36,13 +39,24 @@ const LOGIN_CONFIG = {
 
   story: {
     kicker: "Your Problem · Your Solution",
-    taglines: ["Think Bigger.", "Build Better.", "Create Impact.", "Move Forward."],
+
+    taglines: [
+      "Think Bigger.",
+      "Build Better.",
+      "Create Impact.",
+      "Move Forward.",
+    ],
+
     purposeTitle: "Our Purpose",
+
     purpose:
       "Replace this with the problem your team is solving and why it matters.",
+
     impactTitle: "Our Impact",
+
     impact:
       "Replace this with the measurable outcome your solution is designed to create.",
+
     stats: [
       { value: "01", label: "Core problem" },
       { value: "03", label: "Priority features" },
@@ -75,6 +89,7 @@ export default function Login() {
 
   const [slide, setSlide] = useState(0);
   const [tagline, setTagline] = useState(0);
+
   const [role, setRole] = useState("user");
   const [mode, setMode] = useState("login");
   const [face, setFace] = useState("purpose");
@@ -87,82 +102,114 @@ export default function Login() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
+  /* ----------------------------------------------------------
+     Hero carousel
+     ---------------------------------------------------------- */
+
   const next = useCallback(() => {
     setSlide((current) => (current + 1) % SLIDES.length);
   }, []);
 
   const prev = useCallback(() => {
-    setSlide(
-      (current) => (current - 1 + SLIDES.length) % SLIDES.length,
-    );
+    setSlide((current) => (current - 1 + SLIDES.length) % SLIDES.length);
   }, []);
 
   useEffect(() => {
-    const id = setInterval(next, 4800);
-    return () => clearInterval(id);
+    const interval = setInterval(next, 4800);
+
+    return () => clearInterval(interval);
   }, [next]);
 
+  /* ----------------------------------------------------------
+     Rotating tagline
+     ---------------------------------------------------------- */
+
   useEffect(() => {
-    const id = setInterval(() => {
+    const interval = setInterval(() => {
       setTagline(
-        (current) =>
-          (current + 1) % LOGIN_CONFIG.story.taglines.length,
+        (current) => (current + 1) % LOGIN_CONFIG.story.taglines.length,
       );
     }, 3200);
 
-    return () => clearInterval(id);
+    return () => clearInterval(interval);
   }, []);
+
+  /* ----------------------------------------------------------
+     Reset errors when changing mode
+     ---------------------------------------------------------- */
+
+  const switchMode = (newMode) => {
+    setMode(newMode);
+    setError("");
+  };
+
+  /* ----------------------------------------------------------
+     Login / Register
+     ---------------------------------------------------------- */
 
   const handleSubmit = async (event) => {
     event.preventDefault();
+
     setError("");
 
-    if (!email || !password) {
+    if (!email.trim() || !password.trim()) {
       setError("Please enter your email and password.");
+      return;
+    }
+
+    if (mode === "register" && !name.trim()) {
+      setError("Please enter your name.");
       return;
     }
 
     try {
       setLoading(true);
 
-      if (mode === "register") {
-        if (!name.trim()) {
-          setError("Please enter your name.");
-          return;
-        }
+      let response;
 
-        const response = await authApi.register({
-          name,
-          email,
+      if (mode === "register") {
+        response = await authApi.register({
+          name: name.trim(),
+          email: email.trim(),
           password,
           role,
         });
-
-        if (response?.data?.access_token) {
-          setAccessToken(response.data.access_token);
-        }
       } else {
-        const response = await authApi.login({
-          email,
+        response = await authApi.login({
+          email: email.trim(),
           password,
         });
+      }
 
-        const token =
-          response?.data?.access_token ||
-          response?.data?.token ||
-          response?.data?.accessToken;
+const accessToken =
+  response?.access_token ||
+  response?.data?.access_token ||
+  response?.data?.token ||
+  response?.data?.accessToken;
 
-        if (token) {
-          setAccessToken(token);
-        }
+      const refreshToken =
+        response?.data?.refresh_token || response?.data?.refreshToken;
+      if (!accessToken) {
+        throw new Error(
+          "Authentication succeeded but no access token was returned.",
+        );
+      }
+
+      setAccessToken(accessToken);
+
+      if (refreshToken) {
+        localStorage.setItem("refresh_token", refreshToken);
       }
 
       navigate("/dashboard");
     } catch (err) {
+      console.error("Authentication error:", err);
+
       const message =
         err?.response?.data?.detail ||
         err?.response?.data?.message ||
-        "Something went wrong. Please check your details and try again.";
+        err?.message ||
+        "Unable to complete authentication. Please try again.";
 
       setError(
         typeof message === "string"
@@ -176,12 +223,16 @@ export default function Login() {
 
   return (
     <main className="min-h-screen bg-background lg:grid lg:grid-cols-[1.15fr_.85fr]">
-      {/* LEFT */}
+      {/* ======================================================
+          LEFT SIDE
+          ====================================================== */}
+
       <section className="relative px-5 py-6 sm:px-8 sm:py-8 lg:px-12 lg:py-10 xl:px-16">
+        {/* Background glow */}
         <div className="pointer-events-none absolute inset-0 -z-10 bg-[radial-gradient(circle_at_10%_10%,var(--glow-a),transparent_32%),radial-gradient(circle_at_90%_20%,var(--glow-b),transparent_26%)]" />
 
         <div className="mx-auto max-w-5xl">
-          {/* Branding */}
+          {/* Brand */}
           <div className="mb-6 flex items-center justify-between">
             <div>
               <p className="text-[11px] font-bold uppercase tracking-[0.26em] text-accent">
@@ -193,13 +244,16 @@ export default function Login() {
               </p>
             </div>
 
-            <div className="hidden rounded-full border border-border/80 bg-card/70 px-3 py-1.5 text-xs text-muted-foreground backdrop-blur sm:block">
+            <div className="hidden rounded-full border border-border bg-card/70 px-3 py-1.5 text-xs text-muted-foreground backdrop-blur sm:block">
               Built for rapid iteration
             </div>
           </div>
 
-          {/* Hero */}
-          <div className="relative overflow-hidden rounded-[2rem] border border-border/70 bg-black shadow-[var(--shadow-lift)]">
+          {/* ==================================================
+              HERO IMAGE
+              ================================================== */}
+
+          <div className="relative overflow-hidden rounded-[2rem] border border-border bg-black shadow-[var(--shadow-lift)]">
             <div className="relative h-[360px] sm:h-[500px] lg:h-[540px]">
               {SLIDES.map((image, index) => (
                 <img
@@ -215,11 +269,15 @@ export default function Login() {
                 />
               ))}
 
-              <div className="absolute inset-0 bg-gradient-to-t from-primary/95 via-primary/45 to-transparent" />
+              {/* Dark overlay */}
+              <div className="absolute inset-0 bg-gradient-to-t from-black/95 via-black/50 to-transparent" />
+
+              {/* Saffron accent glow */}
               <div className="absolute inset-0 bg-gradient-to-br from-accent/20 via-transparent to-transparent" />
 
+              {/* Hero text */}
               <div className="absolute inset-x-0 bottom-0 p-6 sm:p-10 lg:p-12">
-                <p className="mb-3 text-xs font-semibold uppercase tracking-[0.28em] text-accent-foreground/90">
+                <p className="mb-3 text-xs font-semibold uppercase tracking-[0.28em] text-accent">
                   {LOGIN_CONFIG.story.kicker}
                 </p>
 
@@ -227,7 +285,7 @@ export default function Login() {
                   {LOGIN_CONFIG.story.taglines.map((text, index) => (
                     <h1
                       key={text}
-                      className={`font-display absolute inset-0 text-4xl font-black leading-tight text-primary-foreground transition-opacity duration-700 sm:text-6xl ${
+                      className={`absolute inset-0 font-display text-4xl font-black leading-tight text-white transition-opacity duration-700 sm:text-6xl ${
                         index === tagline ? "opacity-100" : "opacity-0"
                       }`}
                     >
@@ -236,29 +294,32 @@ export default function Login() {
                   ))}
                 </div>
 
-                <p className="mt-4 max-w-xl text-sm leading-relaxed text-primary-foreground/80 sm:text-base">
+                <p className="mt-4 max-w-xl text-sm leading-relaxed text-white/75 sm:text-base">
                   {LOGIN_CONFIG.subheading}
                 </p>
               </div>
 
+              {/* Previous */}
               <button
                 type="button"
                 onClick={prev}
                 aria-label="Previous image"
-                className="absolute left-4 top-1/2 -translate-y-1/2 rounded-full border border-white/15 bg-black/20 p-2 text-white backdrop-blur-md transition hover:bg-black/35"
+                className="absolute left-4 top-1/2 -translate-y-1/2 rounded-full border border-white/15 bg-black/25 p-2 text-white backdrop-blur-md transition hover:bg-black/40"
               >
                 <ChevronLeft className="h-5 w-5" />
               </button>
 
+              {/* Next */}
               <button
                 type="button"
                 onClick={next}
                 aria-label="Next image"
-                className="absolute right-4 top-1/2 -translate-y-1/2 rounded-full border border-white/15 bg-black/20 p-2 text-white backdrop-blur-md transition hover:bg-black/35"
+                className="absolute right-4 top-1/2 -translate-y-1/2 rounded-full border border-white/15 bg-black/25 p-2 text-white backdrop-blur-md transition hover:bg-black/40"
               >
                 <ChevronRight className="h-5 w-5" />
               </button>
 
+              {/* Dots */}
               <div className="absolute right-6 top-6 flex gap-2">
                 {SLIDES.map((image, index) => (
                   <button
@@ -277,8 +338,12 @@ export default function Login() {
             </div>
           </div>
 
-          {/* Story card */}
-          <div className="mt-6 rounded-[1.7rem] border border-border/80 bg-card/80 p-5 shadow-[var(--shadow-soft)] backdrop-blur sm:p-6">
+          {/* ==================================================
+              PURPOSE / IMPACT CARD
+              ================================================== */}
+
+          <div className="mt-6 rounded-[1.7rem] border border-border bg-card/90 p-5 shadow-[var(--shadow-soft)] backdrop-blur sm:p-6">
+            {/* Toggle */}
             <div className="flex flex-wrap items-center justify-between gap-3">
               <div className="inline-flex rounded-full bg-secondary p-1">
                 {["purpose", "impact"].map((item) => (
@@ -299,23 +364,23 @@ export default function Login() {
 
               <Link
                 to="/"
-                className="hidden text-sm font-semibold text-primary hover:underline sm:inline-flex sm:items-center sm:gap-1"
+                className="hidden items-center gap-1 text-sm font-semibold text-primary hover:underline sm:inline-flex"
               >
                 Explore app
                 <ArrowRight className="h-4 w-4" />
               </Link>
             </div>
 
+            {/* Flip card */}
             <div className="mt-4 [perspective:1400px]">
               <div
                 className="flip-card relative h-[132px]"
                 style={{
                   transform:
-                    face === "impact"
-                      ? "rotateY(180deg)"
-                      : "rotateY(0deg)",
+                    face === "impact" ? "rotateY(180deg)" : "rotateY(0deg)",
                 }}
               >
+                {/* Purpose */}
                 <article className="flip-face absolute inset-0 rounded-2xl border border-border bg-muted/35 p-5">
                   <h2 className="font-display text-lg font-bold text-primary">
                     {LOGIN_CONFIG.story.purposeTitle}
@@ -326,9 +391,12 @@ export default function Login() {
                   </p>
                 </article>
 
+                {/* Impact */}
                 <article
                   className="flip-face absolute inset-0 rounded-2xl border border-border bg-muted/35 p-5"
-                  style={{ transform: "rotateY(180deg)" }}
+                  style={{
+                    transform: "rotateY(180deg)",
+                  }}
                 >
                   <h2 className="font-display text-lg font-bold text-primary">
                     {LOGIN_CONFIG.story.impactTitle}
@@ -341,6 +409,7 @@ export default function Login() {
               </div>
             </div>
 
+            {/* Stats */}
             <div className="mt-5 grid grid-cols-1 gap-2 sm:grid-cols-3">
               {LOGIN_CONFIG.story.stats.map((stat) => (
                 <div
@@ -350,6 +419,7 @@ export default function Login() {
                   <div className="font-display text-lg font-black text-primary">
                     {stat.value}
                   </div>
+
                   <div className="text-xs text-muted-foreground">
                     {stat.label}
                   </div>
@@ -360,14 +430,17 @@ export default function Login() {
         </div>
       </section>
 
-      {/* RIGHT */}
-      <section className="relative flex items-center border-t border-border/60 bg-surface px-5 py-10 sm:px-8 lg:border-l lg:border-t-0 lg:px-10 xl:px-14">
+      {/* ======================================================
+          RIGHT SIDE
+          ====================================================== */}
+
+      <section className="relative flex items-center border-t border-border bg-surface px-5 py-10 sm:px-8 lg:border-l lg:border-t-0 lg:px-10 xl:px-14">
         <div className="absolute inset-y-0 left-0 hidden w-px bg-gradient-to-b from-transparent via-border to-transparent lg:block" />
 
         <div className="mx-auto w-full max-w-md">
           {/* Heading */}
           <div className="mb-8">
-            <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-accent/20 bg-accent-soft px-3 py-1.5 text-xs font-semibold text-accent-foreground">
+            <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-accent/25 bg-accent-soft px-3 py-1.5 text-xs font-semibold text-accent-foreground">
               <Sparkles className="h-3.5 w-3.5" />
               Smart access
             </div>
@@ -383,18 +456,18 @@ export default function Login() {
             </p>
           </div>
 
-          {/* Login/Register */}
+          {/* ==================================================
+              AUTH CARD
+              ================================================== */}
+
           <div className="rounded-[1.75rem] border border-border bg-card p-5 shadow-[var(--shadow-lift)] sm:p-7">
-            {/* Mode switch */}
+            {/* Login / Register */}
             <div className="mb-6 grid grid-cols-2 rounded-xl bg-secondary p-1">
               {["login", "register"].map((item) => (
                 <button
                   type="button"
                   key={item}
-                  onClick={() => {
-                    setMode(item);
-                    setError("");
-                  }}
+                  onClick={() => switchMode(item)}
                   className={`rounded-lg px-4 py-2.5 text-sm font-semibold capitalize transition ${
                     mode === item
                       ? "bg-background text-primary shadow-sm"
@@ -431,6 +504,7 @@ export default function Login() {
                     <div className="text-sm font-semibold text-primary">
                       {item.label}
                     </div>
+
                     <div className="mt-1 text-[11px] leading-4 text-muted-foreground">
                       {item.description}
                     </div>
@@ -441,6 +515,7 @@ export default function Login() {
 
             {/* Form */}
             <form onSubmit={handleSubmit} className="space-y-4">
+              {/* Name */}
               {mode === "register" && (
                 <div>
                   <label className="mb-2 block text-sm font-medium text-primary">
@@ -449,11 +524,14 @@ export default function Login() {
 
                   <div className="relative">
                     <input
+                      type="text"
                       value={name}
                       onChange={(event) => setName(event.target.value)}
                       placeholder="Enter your name"
-                      className="h-11 w-full rounded-xl border border-border bg-background pl-10 pr-3 text-sm outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/15"
+                      autoComplete="name"
+                      className="h-11 w-full rounded-xl border border-border bg-background pl-10 pr-3 text-sm outline-none transition focus:border-accent focus:ring-2 focus:ring-accent/15"
                     />
+
                     <span className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground">
                       <CheckCircle2 className="h-4 w-4" />
                     </span>
@@ -461,6 +539,7 @@ export default function Login() {
                 </div>
               )}
 
+              {/* Email */}
               <div>
                 <label className="mb-2 block text-sm font-medium text-primary">
                   Email
@@ -472,7 +551,8 @@ export default function Login() {
                     value={email}
                     onChange={(event) => setEmail(event.target.value)}
                     placeholder="you@example.com"
-                    className="h-11 w-full rounded-xl border border-border bg-background pl-10 pr-3 text-sm outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/15"
+                    autoComplete="email"
+                    className="h-11 w-full rounded-xl border border-border bg-background pl-10 pr-3 text-sm outline-none transition focus:border-accent focus:ring-2 focus:ring-accent/15"
                   />
 
                   <span className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground">
@@ -481,6 +561,7 @@ export default function Login() {
                 </div>
               </div>
 
+              {/* Password */}
               <div>
                 <label className="mb-2 block text-sm font-medium text-primary">
                   Password
@@ -492,7 +573,10 @@ export default function Login() {
                     value={password}
                     onChange={(event) => setPassword(event.target.value)}
                     placeholder="Enter your password"
-                    className="h-11 w-full rounded-xl border border-border bg-background pl-10 pr-11 text-sm outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/15"
+                    autoComplete={
+                      mode === "login" ? "current-password" : "new-password"
+                    }
+                    className="h-11 w-full rounded-xl border border-border bg-background pl-10 pr-11 text-sm outline-none transition focus:border-accent focus:ring-2 focus:ring-accent/15"
                   />
 
                   <span className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground">
@@ -504,9 +588,7 @@ export default function Login() {
                     onClick={() => setShowPassword((value) => !value)}
                     className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground transition hover:text-primary"
                     aria-label={
-                      showPassword
-                        ? "Hide password"
-                        : "Show password"
+                      showPassword ? "Hide password" : "Show password"
                     }
                   >
                     {showPassword ? (
@@ -518,6 +600,7 @@ export default function Login() {
                 </div>
               </div>
 
+              {/* Forgot password */}
               {mode === "login" && (
                 <div className="flex justify-end">
                   <button
@@ -529,16 +612,18 @@ export default function Login() {
                 </div>
               )}
 
+              {/* Error */}
               {error && (
                 <div className="rounded-xl border border-destructive/20 bg-destructive/5 px-3 py-2.5 text-sm text-destructive">
                   {error}
                 </div>
               )}
 
+              {/* Submit */}
               <button
                 type="submit"
                 disabled={loading}
-                className="flex h-11 w-full items-center justify-center gap-2 rounded-xl bg-primary px-4 text-sm font-semibold text-primary-foreground shadow-sm transition hover:bg-primary-hover disabled:cursor-not-allowed disabled:opacity-60"
+                className="flex h-11 w-full items-center justify-center gap-2 rounded-xl bg-primary px-4 text-sm font-semibold text-primary-foreground shadow-sm transition hover:bg-primary-hover hover:-translate-y-0.5 disabled:cursor-not-allowed disabled:opacity-60"
               >
                 {loading
                   ? "Please wait..."
@@ -552,25 +637,29 @@ export default function Login() {
               </button>
             </form>
 
-            {/* Google UI */}
+            {/* Divider */}
             <div className="my-5 flex items-center gap-3">
               <div className="h-px flex-1 bg-border" />
+
               <span className="text-[11px] uppercase tracking-[0.18em] text-muted-foreground">
                 or
               </span>
+
               <div className="h-px flex-1 bg-border" />
             </div>
 
+            {/* Google UI */}
             <button
               type="button"
               className="flex h-11 w-full items-center justify-center gap-3 rounded-xl border border-border bg-background text-sm font-semibold text-primary transition hover:bg-muted"
             >
-              <span className="grid h-5 w-5 place-items-center rounded-full bg-white text-xs font-black">
+              <span className="grid h-5 w-5 place-items-center rounded-full bg-white text-xs font-black shadow-sm">
                 G
               </span>
               Continue with Google
             </button>
 
+            {/* Terms */}
             <p className="mt-5 text-center text-xs leading-relaxed text-muted-foreground">
               By continuing, you agree to the terms and privacy policy of{" "}
               <span className="font-semibold text-primary">
